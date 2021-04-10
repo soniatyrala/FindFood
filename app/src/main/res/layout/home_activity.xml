@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="235dp"
+        android:layout_height="191dp"
+        android:layout_marginTop="104dp"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toTopOf="parent"
+        map:srcCompat="@drawable/pngtreefood_logo_designs_with_spoon_4158238"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/buttonMap"
+        android:layout_width="151dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="35dp"
+        android:text="Food Map"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toBottomOf="@+id/imageView"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/buttonHistory"
+        android:layout_width="151dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="25dp"
+        android:text="Visited"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toBottomOf="@+id/buttonMap"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/buttonHelp"
+        android:layout_width="151dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="25dp"
+        android:text="Help"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent"
+        map:layout_constraintTop_toBottomOf="@+id/buttonHistory"
+        tools:ignore="MissingConstraints" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

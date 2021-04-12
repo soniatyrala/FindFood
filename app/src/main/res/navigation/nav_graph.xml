@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeActivity">
+
+    <activity
+        android:id="@+id/homeActivity"
+        android:name="com.styrala.findfood.HomeActivity"
+        android:label="home_activity"
+        tools:layout="@layout/home_activity" >
+        <action
+            android:id="@+id/action_homeActivity_to_mapsActivity"
+            app:destination="@id/mapsActivity" />
+    </activity>
+    <activity
+        android:id="@+id/mapsActivity"
+        android:name="com.styrala.findfood.MapsActivity"
+        android:label="activity_maps"
+        tools:layout="@layout/activity_maps" />
+</navigation>

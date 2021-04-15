@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 
 class BitmapDescriptorService {
+
     companion object {
     fun bitmapFromVector(
         context: Context,

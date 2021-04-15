@@ -37,8 +37,15 @@
 
         <activity
             android:name=".MapsActivity"
-            android:parentActivityName=".HomeActivity"
-            android:label="@string/title_activity_maps">
+            android:parentActivityName=".HomeActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".VisitedActivity"
+            android:parentActivityName=".HomeActivity">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

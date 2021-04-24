@@ -7,7 +7,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -16,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.styrala.findfood.model.Places
+import com.styrala.findfood.model.Results
 import com.styrala.findfood.service.BitmapDescriptorService
 import com.styrala.findfood.service.IGoogleAPIService
 import retrofit2.Call
@@ -95,6 +97,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .build()
     }
 
+    private fun addMarkerToMap(googlePlace: Results){
+        val lat = googlePlace.geometry!!.location!!.lat
+        val lng = googlePlace.geometry!!.location!!.lng
+        val location = LatLng(lat, lng)
+        val pin = mMap.addMarker(
+            MarkerOptions()
+                .position(location)
+                .title(googlePlace.name)
+                .icon(BitmapDescriptorService.bitmapFromVector(
+                applicationContext, R.drawable.ic_baseline_local_pizza_24)))
+        pin.showInfoWindow()
+    }
+
     private fun getNearByPlaceType(placeType: String) {
         val url = getUrl(this.latitude, this.longitude, placeType)
         mService.getNearbyPlaces(url!!)
@@ -102,18 +117,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 override fun onResponse(call: Call<Places>, response: Response<Places>) {
                     if (response.isSuccessful){
                         for(i in response.body()!!.results!!.indices){
-                            val markerOptions = MarkerOptions()
-                            val googlePlace = response.body()!!.results!![i]
-                            val lat = googlePlace.geometry!!.location!!.lat
-                            val lng = googlePlace.geometry!!.location!!.lng
-                            val placeName = googlePlace.name
-                            val location = LatLng(lat, lng)
-                            markerOptions.position(location)
-                            markerOptions.title(placeName)
-                            markerOptions.icon(BitmapDescriptorService.bitmapFromVector(
-                                applicationContext, R.drawable.ic_baseline_local_pizza_24))
-                            markerOptions.snippet(i.toString())
-                            mMap.addMarker(markerOptions)
+                            addMarkerToMap(response.body()!!.results!![i])
                         }
                     }
                 }

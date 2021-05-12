@@ -1,6 +1,7 @@
 package com.styrala.findfood.common
 
 import android.util.Log
+import com.styrala.findfood.service.IGoogleAPIService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -9,7 +10,10 @@ object Common {
     val API_KEY = "AIzaSyAo98VzOt144DOb5XuQMSRG1xuWDKWIzVs"
     val RESTAURANT_TYPE = "restaurant"
 
-    fun getClient(baseUrl: String): Retrofit {
+    val googleApiService: IGoogleAPIService
+        get() = getClient(MAPS_URL).create(IGoogleAPIService::class.java)
+
+    private fun getClient(baseUrl: String): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())

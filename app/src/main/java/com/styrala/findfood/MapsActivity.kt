@@ -14,10 +14,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.styrala.findfood.common.Common.MAPS_URL
 import com.styrala.findfood.common.Common.RESTAURANT_TYPE
-import com.styrala.findfood.common.Common.getClient
 import com.styrala.findfood.common.Common.getUrl
+import com.styrala.findfood.common.Common.googleApiService
 import com.styrala.findfood.model.Places
 import com.styrala.findfood.model.Results
 import com.styrala.findfood.service.BitmapDescriptorService
@@ -40,7 +39,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
         mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        mService = getClient(MAPS_URL).create(IGoogleAPIService::class.java)
+        mService = googleApiService
         mapFragment.getMapAsync(this)
     }
 
@@ -56,7 +55,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setCurrentLocationOnMap() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
                 this.latitude = location?.latitude!!
                 this.longitude = location.longitude
@@ -67,7 +67,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         } else {
             ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 44)
+                this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 44
+            )
             setCurrentLocationOnMap()
         }
     }

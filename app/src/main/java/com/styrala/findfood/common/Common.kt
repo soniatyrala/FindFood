@@ -1,6 +1,9 @@
 package com.styrala.findfood.common
 
 import android.util.Log
+import com.google.android.gms.maps.model.Marker
+import com.styrala.findfood.model.Places
+import com.styrala.findfood.model.Results
 import com.styrala.findfood.service.IGoogleAPIService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -9,6 +12,9 @@ object Common {
     val MAPS_URL = "https://maps.googleapis.com/"
     val API_KEY = "AIzaSyAo98VzOt144DOb5XuQMSRG1xuWDKWIzVs"
     val RESTAURANT_TYPE = "restaurant"
+    lateinit var currentResult: Results
+    lateinit var currentPlaces: Places
+    var currentMarkers: MutableList<Marker> = mutableListOf()
 
     val googleApiService: IGoogleAPIService
         get() = getClient(MAPS_URL).create(IGoogleAPIService::class.java)
@@ -30,6 +36,16 @@ object Common {
         googlePlacesUrl.append("&key=$API_KEY")
         Log.d("URL: ", googlePlacesUrl.toString())
         return googlePlacesUrl.toString()
+    }
+
+    fun getPhotoUrl(photoReference: String?, maxWidth: Int): String {
+        val placePhotoUrl = StringBuilder(MAPS_URL)
+        placePhotoUrl.append("maps/api/place/photo?")
+        placePhotoUrl.append("maxWidth=$maxWidth")
+        placePhotoUrl.append("&photoreference=$photoReference")
+        placePhotoUrl.append("&key=$API_KEY")
+        Log.d("Photo URL:  ", placePhotoUrl.toString())
+        return placePhotoUrl.toString()
     }
 
 }

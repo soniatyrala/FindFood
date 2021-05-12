@@ -3,11 +3,7 @@ package com.styrala.findfood
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -17,11 +13,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.maps.android.ui.IconGenerator
 import com.styrala.findfood.common.Common.RESTAURANT_TYPE
 import com.styrala.findfood.common.Common.currentMarkers
 import com.styrala.findfood.common.Common.currentPlaces
@@ -30,6 +24,7 @@ import com.styrala.findfood.common.Common.getUrl
 import com.styrala.findfood.common.Common.googleApiService
 import com.styrala.findfood.model.Places
 import com.styrala.findfood.model.Results
+import com.styrala.findfood.service.BitmapDescriptorService
 import com.styrala.findfood.service.IGoogleAPIService
 import retrofit2.Call
 import retrofit2.Callback
@@ -93,14 +88,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val lat = googlePlace.geometry!!.location!!.lat
         val lng = googlePlace.geometry!!.location!!.lng
         val location = LatLng(lat, lng)
-        val pin = mMap.addMarker(
+        return mMap.addMarker(
             MarkerOptions()
                 .position(location)
                 .title(googlePlace.name)
-                .icon(BitmapDescriptorFactory.fromBitmap(getMarkerIconWithLabel(googlePlace.name!!)))
+                .icon(
+                    BitmapDescriptorService.bitmapFromVector(
+                        applicationContext, R.drawable.ic_baseline_local_pizza_24
+                    )
+                )
         )
-        pin.showInfoWindow()
-        return pin
     }
 
     private fun getNearByPlaceType(placeType: String) {
@@ -120,17 +117,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     Toast.makeText(baseContext, "" + t.message, Toast.LENGTH_SHORT).show()
                 }
             })
-    }
-
-    private fun getMarkerIconWithLabel(label: String): Bitmap {
-        val iconGenerator = IconGenerator(applicationContext)
-        val markerView: View =
-            LayoutInflater.from(applicationContext).inflate(R.layout.lay_marker, null)
-        val tvLabel: TextView = markerView.findViewById(R.id.pin_name)
-        tvLabel.text = label
-        iconGenerator.setContentView(markerView)
-        iconGenerator.setBackground(null)
-        return iconGenerator.makeIcon(label)
     }
 }
 

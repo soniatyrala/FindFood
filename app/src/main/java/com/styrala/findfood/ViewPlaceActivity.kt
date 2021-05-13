@@ -1,7 +1,6 @@
 package com.styrala.findfood
 
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.squareup.picasso.Picasso
 import com.styrala.findfood.common.Common.currentResult
@@ -24,23 +23,21 @@ class ViewPlaceActivity : AppCompatActivity() {
 //            startActivity(mapIntent)
 //        }
 
-        if (currentResult.name != null) {
-            place_name.text = currentResult.name
+        place_name.text = currentResult.name
+
+        if (currentResult.photos != null){
+            Picasso.with(applicationContext)
+                .load(getPhotoUrl(currentResult.photos!![0].photo_reference, 1000))
+                .into(photo)
+        } else {
+            Picasso.with(applicationContext)
+                .load(currentResult.icon)
+                .into(photo)
         }
 
-        if (currentResult.photos != null && currentResult.photos!!.isNotEmpty())
-            Picasso.with(this)
-                .load(getPhotoUrl(currentResult.photos!![0].photoReference, 1000))
-                .into(photo)
 
-        if (currentResult.rating != null)
-            place_rating_bar.rating = currentResult.rating.toFloat()
-        else
-            place_rating_bar.visibility = View.GONE
+        place_rating_bar.rating = currentResult.rating.toFloat()
 
-        if (currentResult.openingHours != null)
-            place_open_hour.text = "Open now: " + currentResult.openingHours!!.openNow
-        else
-            place_open_hour.visibility = View.GONE
+        place_open_hour.text = "Open now: " + (currentResult.opening_hours?.open_now ?: " - ")
     }
 }

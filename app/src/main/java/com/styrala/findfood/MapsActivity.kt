@@ -52,11 +52,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap!!
         mMap.mapType = GoogleMap.MAP_TYPE_TERRAIN
         mMap.clear()
+        setCurrentLocationOnMap()
         mMap.uiSettings.isCompassEnabled = true
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.setAllGesturesEnabled(true)
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        setCurrentLocationOnMap()
         mMap.setOnMarkerClickListener { marker ->
             currentResult = currentPlaces.results!![currentMarkers.indexOf(marker)]
             startActivity(Intent(this@MapsActivity, ViewPlaceActivity::class.java))
@@ -94,7 +94,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .title(googlePlace.name)
                 .icon(
                     BitmapDescriptorService.bitmapFromVector(
-                        applicationContext, R.drawable.ic_baseline_local_pizza_24
+                        applicationContext, R.drawable.ic_twotone_local_pizza_24
                     )
                 )
         )

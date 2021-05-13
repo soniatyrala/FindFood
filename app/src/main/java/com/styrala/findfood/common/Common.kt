@@ -41,11 +41,20 @@ object Common {
     fun getPhotoUrl(photoReference: String?, maxWidth: Int): String {
         val placePhotoUrl = StringBuilder(MAPS_URL)
         placePhotoUrl.append("maps/api/place/photo?")
-        placePhotoUrl.append("maxWidth=$maxWidth")
+        placePhotoUrl.append("maxwidth=$maxWidth")
         placePhotoUrl.append("&photoreference=$photoReference")
         placePhotoUrl.append("&key=$API_KEY")
         Log.d("Photo URL:  ", placePhotoUrl.toString())
         return placePhotoUrl.toString()
+    }
+
+    fun getPlaceDetailsUrl(placeId: String?): String {
+        val placeDetailsUrl = StringBuilder(MAPS_URL)
+        placeDetailsUrl.append("maps/api/place/details/json?")
+        placeDetailsUrl.append("place_id=$placeId")
+        placeDetailsUrl.append("&key=$API_KEY")
+        Log.d("Place details URL:  ", placeDetailsUrl.toString())
+        return placeDetailsUrl.toString()
     }
 
 }

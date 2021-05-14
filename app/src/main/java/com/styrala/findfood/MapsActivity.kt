@@ -14,17 +14,14 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.styrala.findfood.common.Common.RESTAURANT_TYPE
+import com.styrala.findfood.common.Common.addMarkerToMap
 import com.styrala.findfood.common.Common.currentMarkers
 import com.styrala.findfood.common.Common.currentPlaces
 import com.styrala.findfood.common.Common.currentResult
 import com.styrala.findfood.common.Common.getUrl
 import com.styrala.findfood.common.Common.googleApiService
 import com.styrala.findfood.model.Places
-import com.styrala.findfood.model.Results
-import com.styrala.findfood.service.BitmapDescriptorService
 import com.styrala.findfood.service.IGoogleAPIService
 import retrofit2.Call
 import retrofit2.Callback
@@ -50,7 +47,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap?) {
         mMap = googleMap!!
-        mMap.mapType = GoogleMap.MAP_TYPE_TERRAIN
         mMap.clear()
         setCurrentLocationOnMap()
         mMap.uiSettings.isCompassEnabled = true
@@ -84,21 +80,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun addMarkerToMap(googlePlace: Results): Marker {
-        val lat = googlePlace.geometry!!.location!!.lat
-        val lng = googlePlace.geometry!!.location!!.lng
-        val location = LatLng(lat, lng)
-        return mMap.addMarker(
-            MarkerOptions()
-                .position(location)
-                .title(googlePlace.name)
-                .icon(
-                    BitmapDescriptorService.bitmapFromVector(
-                        applicationContext, R.drawable.ic_twotone_local_pizza_24
-                    )
-                )
-        )
-    }
 
     private fun getNearByPlaceType(placeType: String) {
         val url = getUrl(this.latitude, this.longitude, placeType)
@@ -108,7 +89,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (response.isSuccessful) {
                         currentPlaces = response.body()!!
                         for (i in currentPlaces.results!!.indices) {
-                            currentMarkers.add(addMarkerToMap(currentPlaces.results!![i]))
+                            currentMarkers.add(
+                                addMarkerToMap(
+                                    currentPlaces.results!![i],
+                                    mMap,
+                                    applicationContext
+                                )
+                            )
                         }
                     }
                 }

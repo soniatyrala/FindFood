@@ -1,6 +1,6 @@
 package com.styrala.findfood.model
 
 class OpeningHours {
-    var openNow = false
+    var open_now = false
     var weekdayText: Array<String>? = null
 }

@@ -1,9 +1,15 @@
 package com.styrala.findfood.common
 
+import android.content.Context
 import android.util.Log
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.styrala.findfood.R
 import com.styrala.findfood.model.Places
 import com.styrala.findfood.model.Results
+import com.styrala.findfood.service.BitmapDescriptorService
 import com.styrala.findfood.service.IGoogleAPIService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -55,6 +61,22 @@ object Common {
         placeDetailsUrl.append("&key=$API_KEY")
         Log.d("Place details URL:  ", placeDetailsUrl.toString())
         return placeDetailsUrl.toString()
+    }
+
+    fun addMarkerToMap(googlePlace: Results, mMap: GoogleMap, applicationContext: Context): Marker {
+        val lat = googlePlace.geometry!!.location!!.lat
+        val lng = googlePlace.geometry!!.location!!.lng
+        val location = LatLng(lat, lng)
+        return mMap.addMarker(
+            MarkerOptions()
+                .position(location)
+                .title(googlePlace.name)
+                .icon(
+                    BitmapDescriptorService.bitmapFromVector(
+                        applicationContext, R.drawable.ic_twotone_local_pizza_24
+                    )
+                )
+        )
     }
 
 }

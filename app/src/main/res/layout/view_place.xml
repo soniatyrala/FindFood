@@ -11,6 +11,13 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <fragment
+            android:id="@+id/map_place"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            tools:context=".ViewPlaceActivity" />
+
         <ImageView
             android:id="@+id/photo"
             android:layout_width="match_parent"
@@ -30,20 +37,39 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:gravity="center"/>
 
             <TextView
                 android:id="@+id/place_open_hour"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                android:gravity="center"/>
 
-            <RatingBar
-                android:id="@+id/place_rating_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:max="5" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+                <RatingBar
+                    android:id="@+id/place_rating_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:max="5" />
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btn_add_rate"

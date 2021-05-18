@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">FindFood</string>
     <string name="title_activity_maps">FoodMap</string>
-    <string name="add_rate">add rate</string>
+    <string name="opinions">Opinions</string>
 </resources>

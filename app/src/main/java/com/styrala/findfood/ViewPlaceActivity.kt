@@ -1,6 +1,7 @@
 package com.styrala.findfood
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -34,8 +35,7 @@ class ViewPlaceActivity : AppCompatActivity(), OnMapReadyCallback {
 
         btn_opinions.text = "Opinions " + "(" + currentResult.user_ratings_total + ")"
         btn_opinions.setOnClickListener {
-//            val mapIntent = Intent(Intent.ACTION_VIEW, )
-//            startActivity(mapIntent)
+            startActivity(Intent(this@ViewPlaceActivity, ReviewActivity::class.java))
         }
 
         place_name.text = currentResult.name
@@ -53,10 +53,10 @@ class ViewPlaceActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap?) {
         mMap = googleMap!!
-        mMap.mapType = GoogleMap.MAP_TYPE_TERRAIN;
+        mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE;
         mMap.clear()
         addMarkerToMap(currentResult, mMap, applicationContext)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 15f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), 18f))
         mMap.uiSettings.setAllGesturesEnabled(false)
     }
 }

@@ -81,7 +81,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
     private fun getNearByPlaceType(placeType: String) {
         val url = getUrl(this.latitude, this.longitude, placeType)
         mService.getNearbyPlaces(url!!)

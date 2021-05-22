@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.styrala.findfood.R
+import com.styrala.findfood.model.PlaceDetails
 import com.styrala.findfood.model.Places
 import com.styrala.findfood.model.Results
 import com.styrala.findfood.service.BitmapDescriptorService
@@ -54,7 +55,7 @@ object Common {
         return placePhotoUrl.toString()
     }
 
-    fun getPlaceDetailsUrl(placeId: String?): String {
+    fun getPlaceDetailUrl(placeId: String?): String {
         val placeDetailsUrl = StringBuilder(MAPS_URL)
         placeDetailsUrl.append("maps/api/place/details/json?")
         placeDetailsUrl.append("place_id=$placeId")

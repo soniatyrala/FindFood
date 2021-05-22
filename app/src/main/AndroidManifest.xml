@@ -15,11 +15,6 @@
         android:roundIcon="@drawable/ic_baseline_fastfood_24"
         android:supportsRtl="true"
         android:theme="@style/Theme.FindFood">
-        <activity
-            android:name=".ReviewActivity"
-            android:label="@string/title_activity_review"
-            android:theme="@style/Theme.FindFood.NoActionBar"></activity>
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -47,6 +42,13 @@
         <activity
             android:name=".ViewPlaceActivity"
             android:parentActivityName=".MapsActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ReviewActivity"
+            android:parentActivityName=".ViewPlaceActivity">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

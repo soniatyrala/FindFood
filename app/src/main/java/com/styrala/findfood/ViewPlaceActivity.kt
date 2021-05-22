@@ -33,7 +33,7 @@ class ViewPlaceActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment = supportFragmentManager.findFragmentById(R.id.map_place) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        btn_opinions.text = "Opinions " + "(" + currentResult.user_ratings_total + ")"
+        btn_opinions.text = "Opinions"
         btn_opinions.setOnClickListener {
             startActivity(Intent(this@ViewPlaceActivity, ReviewActivity::class.java))
         }
@@ -48,6 +48,7 @@ class ViewPlaceActivity : AppCompatActivity(), OnMapReadyCallback {
 
         place_rating_bar.rating = currentResult.rating.toFloat()
         rating.text = currentResult.rating.toString()
+        ratings.text = "(" + currentResult.user_ratings_total + ")"
         place_open_hour.text = "Open now: " + (currentResult.opening_hours?.open_now ?: " - ")
     }
 

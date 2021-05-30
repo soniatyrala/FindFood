@@ -12,12 +12,14 @@ import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import com.styrala.findfood.common.Common.currentResult
 import com.styrala.findfood.common.Common.getPlaceDetailUrl
 import com.styrala.findfood.common.Common.googleApiService
 import com.styrala.findfood.model.PlaceDetails
 import com.styrala.findfood.model.Review
 import com.styrala.findfood.service.IGoogleAPIService
+import kotlinx.android.synthetic.main.activity_review.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,10 +34,10 @@ class ReviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_review)
         mService = googleApiService
-//        fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show()
-//        }
+        fab.setOnClickListener { view ->
+            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
+        }
 
         val linearLayout: View = findViewById(R.id.content)
 
@@ -73,30 +75,41 @@ class ReviewActivity : AppCompatActivity() {
         rating.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         rating.orientation = LinearLayout.HORIZONTAL
         rating.gravity = Gravity.CENTER_VERTICAL
-        val ratingBar = RatingBar(this)
-        ratingBar.max = 5
-        ratingBar.rating = review.rating.toFloat()
-        ratingBar.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        val stars = ratingBar.progressDrawable as LayerDrawable
-        stars.getDrawable(2).setColorFilter(Color.parseColor("#FF9800"), PorterDuff.Mode.SRC_ATOP)
-        val ratingText = TextView(this)
-        ratingText.text = review.rating.toString()
-        ratingText.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        rating.addView(ratingText)
-        rating.addView(ratingBar)
 
-        val textView = TextView(this)
-        textView.text = review.text
-        textView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        if (review.rating != null) {
+            val ratingBar = RatingBar(this)
+            ratingBar.layoutParams =
+                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            ratingBar.max = 5
+            ratingBar.rating = review.rating.toFloat()
+            val stars = ratingBar.progressDrawable as LayerDrawable
+            stars.getDrawable(2)
+                .setColorFilter(Color.parseColor("#FF9800"), PorterDuff.Mode.SRC_ATOP)
+            val ratingText = TextView(this)
+            ratingText.text = review.rating.toString()
+            ratingText.layoutParams =
+                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            rating.addView(ratingText)
+            rating.addView(ratingBar)
+            reviewLayout.addView(rating)
+        }
 
-        val authorView = TextView(this)
-        authorView.text = review.author_name
-        authorView.gravity = Gravity.RIGHT
-        authorView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        if (review.text != null) {
+            val textView = TextView(this)
+            textView.layoutParams =
+                LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            textView.text = review.text
+            reviewLayout.addView(textView)
+        }
 
-        reviewLayout.addView(rating)
-        reviewLayout.addView(textView)
-        reviewLayout.addView(authorView)
+        if (review.author_name != null) {
+            val authorView = TextView(this)
+            authorView.text = review.author_name
+            authorView.gravity = Gravity.RIGHT
+            authorView.layoutParams =
+                LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            reviewLayout.addView(authorView)
+        }
     }
 }
 

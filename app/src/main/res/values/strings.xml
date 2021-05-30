@@ -4,4 +4,5 @@
     <string name="opinions">Opinions</string>
     <string name="title_activity_review">Add review</string>
     <string name="action_settings">Settings</string>
+    <string name="add_review">Add review</string>
 </resources>

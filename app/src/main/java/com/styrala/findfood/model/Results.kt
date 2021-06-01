@@ -15,5 +15,5 @@ class Results {
     var types: Array<String>? = null
     var user_ratings_total = 0
     var vicinity: String? = null
-    var reviews: Array<Review>? = null
+    var reviews: List<Review>? = null
 }

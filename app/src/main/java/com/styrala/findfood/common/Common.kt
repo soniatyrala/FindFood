@@ -1,6 +1,7 @@
 package com.styrala.findfood.common
 
 import android.content.Context
+import android.location.Location
 import android.util.Log
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -11,6 +12,7 @@ import com.styrala.findfood.model.PlaceDetails
 import com.styrala.findfood.model.Places
 import com.styrala.findfood.model.Results
 import com.styrala.findfood.service.BitmapDescriptorService
+import com.styrala.findfood.service.DatabaseService
 import com.styrala.findfood.service.IGoogleAPIService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -21,10 +23,13 @@ object Common {
     val RESTAURANT_TYPE = "restaurant"
     lateinit var currentResult: Results
     lateinit var currentPlaces: Places
+    lateinit var db: DatabaseService
     var currentMarkers: MutableList<Marker> = mutableListOf()
+    var defaultLocation: LatLng = LatLng(52.222727, 21.014003)
 
     val googleApiService: IGoogleAPIService
         get() = getClient(MAPS_URL).create(IGoogleAPIService::class.java)
+
 
     private fun getClient(baseUrl: String): Retrofit {
         return Retrofit.Builder()

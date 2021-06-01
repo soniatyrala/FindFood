@@ -19,6 +19,7 @@ import com.styrala.findfood.common.Common.addMarkerToMap
 import com.styrala.findfood.common.Common.currentMarkers
 import com.styrala.findfood.common.Common.currentPlaces
 import com.styrala.findfood.common.Common.currentResult
+import com.styrala.findfood.common.Common.defaultLocation
 import com.styrala.findfood.common.Common.getUrl
 import com.styrala.findfood.common.Common.googleApiService
 import com.styrala.findfood.model.Places
@@ -66,8 +67,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             == PackageManager.PERMISSION_GRANTED
         ) {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-                this.latitude = location?.latitude!!
-                this.longitude = location.longitude
+                if (location != null) {
+                    this.latitude = location.latitude
+                    this.longitude = location.longitude
+                } else {
+                    this.latitude = defaultLocation.latitude
+                    this.longitude = defaultLocation.longitude
+                }
                 val lastLocation = LatLng(latitude, longitude)
                 mMap.isMyLocationEnabled = true
                 getNearByPlaceType(RESTAURANT_TYPE)
@@ -80,7 +86,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             setCurrentLocationOnMap()
         }
     }
-
 
     private fun getNearByPlaceType(placeType: String) {
         val url = getUrl(this.latitude, this.longitude, placeType)

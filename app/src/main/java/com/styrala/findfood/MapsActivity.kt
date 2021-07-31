@@ -24,6 +24,7 @@ import com.styrala.findfood.common.Common.getUrl
 import com.styrala.findfood.common.Common.googleApiService
 import com.styrala.findfood.model.Places
 import com.styrala.findfood.service.IGoogleAPIService
+import kotlinx.android.synthetic.main.activity_maps.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -44,6 +45,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         mService = googleApiService
         mapFragment.getMapAsync(this)
+
+        btn_home.setOnClickListener{
+            startActivity(Intent(this@MapsActivity, HomeActivity::class.java))
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap?) {

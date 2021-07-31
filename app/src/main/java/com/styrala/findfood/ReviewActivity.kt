@@ -14,8 +14,6 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.isVisible
 import com.google.android.material.appbar.AppBarLayout
 import com.styrala.findfood.common.Common.currentResult
 import com.styrala.findfood.common.Common.db
@@ -25,11 +23,9 @@ import com.styrala.findfood.model.PlaceDetails
 import com.styrala.findfood.model.Review
 import com.styrala.findfood.service.IGoogleAPIService
 import kotlinx.android.synthetic.main.activity_review.*
-import kotlinx.android.synthetic.main.view_place.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 
 
 class ReviewActivity : AppCompatActivity() {
@@ -43,7 +39,6 @@ class ReviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_review)
         mService = googleApiService
-        val appBar = findViewById<View>(R.id.app_bar) as AppBarLayout
         val ratingBar = findViewById<View>(R.id.your_rating) as RatingBar
         val editText = findViewById<View>(R.id.your_review) as EditText
         editText.setOnTouchListener(OnTouchListener { v, event ->
@@ -56,23 +51,30 @@ class ReviewActivity : AppCompatActivity() {
 
         fab.setOnClickListener { view ->
             val review = Review(
-                UUID.randomUUID().toString(),
-                ratingBar.numStars.toDouble(),
+                ratingBar.rating.toDouble(),
                 editText.text.toString(),
                 System.currentTimeMillis().toString(),
                 currentResult.place_id.toString()
             )
             db.addReview(review)
             db.addVisitedPlace(currentResult, review)
-            // dodac review do listy zeby sie wyswietlilo w scrollu
 
             Toast.makeText(this.applicationContext, "Review is saved", Toast.LENGTH_SHORT)
                 .show()
-            finish()
+            startActivity(Intent(this@ReviewActivity, ViewPlaceActivity::class.java))
         }
 
         val linearLayout: View = findViewById(R.id.content)
 
+        // Reviews from database
+        if (currentResult.place_id != null) {
+            reviews = db.getReviewsByPlaceId(currentResult.place_id!!)
+            for(i in reviews.indices) {
+                addReview(reviews[i], linearLayout)
+            }
+        }
+
+        // Reviews from Google API
         if (currentResult.place_id != null) {
             mService.getPlaceDetails(getPlaceDetailUrl(currentResult.place_id!!))
                 .enqueue(object : Callback<PlaceDetails> {

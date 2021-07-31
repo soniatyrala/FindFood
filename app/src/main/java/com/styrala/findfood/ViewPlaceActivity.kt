@@ -12,10 +12,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.squareup.picasso.Picasso
 import com.styrala.findfood.common.Common.addMarkerToMap
 import com.styrala.findfood.common.Common.currentResult
+import com.styrala.findfood.common.Common.db
 import com.styrala.findfood.common.Common.getPhotoUrl
 import com.styrala.findfood.common.Common.googleApiService
 import com.styrala.findfood.service.IGoogleAPIService
 import kotlinx.android.synthetic.main.view_place.*
+import kotlin.math.round
 
 class ViewPlaceActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -33,9 +35,12 @@ class ViewPlaceActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment = supportFragmentManager.findFragmentById(R.id.map_place) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        btn_opinions.text = "Opinions"
         btn_opinions.setOnClickListener {
             startActivity(Intent(this@ViewPlaceActivity, ReviewActivity::class.java))
+        }
+
+        btn_backToMap.setOnClickListener {
+            startActivity(Intent(this@ViewPlaceActivity, MapsActivity::class.java))
         }
 
         place_name.text = currentResult.name
@@ -45,10 +50,18 @@ class ViewPlaceActivity : AppCompatActivity(), OnMapReadyCallback {
                 .load(getPhotoUrl(currentResult.photos!![0].photo_reference, 1000))
                 .into(photo)
         }
-
-        place_rating_bar.rating = currentResult.rating.toFloat()
-        rating.text = currentResult.rating.toString()
-        ratings.text = "(" + currentResult.user_ratings_total + ")"
+        val ratingsFromDB = db.getRatingsByPlaceId(currentResult.place_id.toString())
+        if (ratingsFromDB.isNotEmpty()) {
+            val ratingFromDB = round((currentResult.rating * currentResult.user_ratings_total).plus(ratingsFromDB["ratings"]!!).div(currentResult.user_ratings_total
+                        .plus(ratingsFromDB["amount"]!!.toDouble())) * 100.0) / 100.0
+            place_rating_bar.rating = ratingFromDB.toFloat()
+            ratings.text = "(" + currentResult.user_ratings_total.plus(ratingsFromDB["amount"]!!.toInt()) + ")"
+            rating.text = ratingFromDB.toString()
+        } else {
+            place_rating_bar.rating = currentResult.rating.toFloat()
+            ratings.text = "(" + currentResult.user_ratings_total + ")"
+            rating.text = currentResult.rating.toString()
+        }
         place_open_hour.text = "Open now: " + (currentResult.opening_hours?.open_now ?: " - ")
     }
 

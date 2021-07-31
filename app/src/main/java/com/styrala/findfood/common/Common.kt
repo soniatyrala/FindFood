@@ -1,14 +1,12 @@
 package com.styrala.findfood.common
 
 import android.content.Context
-import android.location.Location
 import android.util.Log
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.styrala.findfood.R
-import com.styrala.findfood.model.PlaceDetails
 import com.styrala.findfood.model.Places
 import com.styrala.findfood.model.Results
 import com.styrala.findfood.service.BitmapDescriptorService
@@ -19,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object Common {
     val MAPS_URL = "https://maps.googleapis.com/"
-    val API_KEY = "AIzaSyAo98VzOt144DOb5XuQMSRG1xuWDKWIzVs"
+    val API_KEY = "AIzaSyDbIZEc20wYfEwOKhCMzoU8J6iwVHZgMHQ"
     val RESTAURANT_TYPE = "restaurant"
     lateinit var currentResult: Results
     lateinit var currentPlaces: Places
@@ -42,7 +40,7 @@ object Common {
         val googlePlacesUrl = StringBuilder(MAPS_URL)
         googlePlacesUrl.append("maps/api/place/nearbysearch/json?")
         googlePlacesUrl.append("location=$latitude,$longitude")
-        googlePlacesUrl.append("&radius=1000")
+        googlePlacesUrl.append("&radius=2000")
         googlePlacesUrl.append("&type=$placeType")
         googlePlacesUrl.append("&sensor=true")
         googlePlacesUrl.append("&key=$API_KEY")

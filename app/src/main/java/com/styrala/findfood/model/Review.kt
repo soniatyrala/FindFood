@@ -14,8 +14,7 @@ class Review {
 
     constructor()
 
-    constructor(id: String, rating: Double, text: String?, time: String, place_id: String) {
-        this.id = id
+    constructor(rating: Double, text: String?, time: String, place_id: String) {
         this.rating = rating
         this.text = text
         this.time = time

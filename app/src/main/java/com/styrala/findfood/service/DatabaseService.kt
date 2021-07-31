@@ -1,13 +1,16 @@
 package com.styrala.findfood.service
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.styrala.findfood.model.Results
 import com.styrala.findfood.model.Review
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class DatabaseService(context: Context?) : SQLiteOpenHelper(
@@ -17,15 +20,25 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
     DATABASE_VERSION
 ) {
 
+    companion object {
+        private const val DATABASE_VERSION = 7
+        private const val DATABASE_NAME = "FoodDB"
+        private const val REVIEW_TABLE = "reviews"
+        private const val PLACE_ID = "place_id"
+        private const val DATE_TIME = "date_time"
+        private const val VISITED_TABLE = "visited_places"
+    }
+
     override fun onCreate(db: SQLiteDatabase) {
         val REVIEW_TABLE = ("CREATE TABLE IF NOT EXISTS reviews ( "
-                + "id INTEGER PRIMARY KEY AUTOINCREMENT," + "review_id TEXT, " + "rating NUMERIC, "
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT," + "rating NUMERIC, "
                 + "text TEXT, " + "place_id TEXT," + "date_time TEXT)")
         db.execSQL(REVIEW_TABLE)
 
         val VISITED_TABLE = ("CREATE TABLE IF NOT EXISTS visited_places ( "
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, " + "place_id TEXT," + "name TEXT, "
-                + "latitude NUMERIC, " + "longitude NUMERIC," + "review_id TEXT)")
+                + "latitude NUMERIC, " + "longitude NUMERIC," + "text TEXT," + "rating NUMERIC,"
+                + "date_time TEXT)")
         db.execSQL(VISITED_TABLE)
     }
 
@@ -40,29 +53,68 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
         onCreate(db)
     }
 
-//    fun allReviews(): List<Review?> {
-//        val reviews: LinkedList<Review> = LinkedList<Review>()
-//        val query = "SELECT  * FROM $REVIEW_TABLE"
-//        val db = this.writableDatabase
-//        val cursor: Cursor = db.rawQuery(query, null)
-//        var review: Review?
-//        if (cursor.moveToFirst()) {
-//            do {
-//                review = Review()
-//                review.rating = cursor.getDouble(1)
-//                review.text = cursor.getString(2)
-//                review.place_id = cursor.getString(3)
-//                review.time = cursor.getLong(4)
-//                reviews.add(review)
-//            } while (cursor.moveToNext())
-//        }
-//        return reviews
-//    }
+    fun allReviews(): List<Review?> {
+        val reviews: LinkedList<Review> = LinkedList<Review>()
+        val query = "SELECT  * FROM $REVIEW_TABLE"
+        val db = this.writableDatabase
+        val cursor: Cursor = db.rawQuery(query, null)
+        var review: Review?
+        if (cursor.moveToFirst()) {
+            do {
+                review = Review()
+                review.rating = cursor.getDouble(1)
+                review.text = cursor.getString(2)
+                review.place_id = cursor.getString(3)
+                review.time = cursor.getString(4)
+                reviews.add(review)
+            } while (cursor.moveToNext())
+        }
+        return reviews
+    }
+
+    @SuppressLint("Recycle")
+    fun getReviewsByPlaceId(place_id: String): LinkedList<Review> {
+        val reviews: LinkedList<Review> = LinkedList()
+        val query = "SELECT  * FROM $REVIEW_TABLE WHERE $PLACE_ID = '$place_id' order by $DATE_TIME desc"
+        val db = this.readableDatabase
+        val cursor: Cursor = db.rawQuery(query, null)
+        if (cursor.moveToFirst()) {
+            do {
+                val rating = cursor.getDouble(cursor.getColumnIndex("rating"))
+                val text = cursor.getString(cursor.getColumnIndex("text"))
+                val placeId = cursor.getString(cursor.getColumnIndex("place_id"))
+                val time = cursor.getString(cursor.getColumnIndex("date_time"))
+                val review = Review(rating, text, time, placeId)
+                reviews.add(review)
+            } while (cursor.moveToNext())
+        }
+        return reviews
+    }
+
+    fun getRatingsByPlaceId(place_id: String): HashMap<String, Double> {
+        val ratings: ArrayList<Double> = ArrayList()
+        var sumRatings: Double = 0.0
+        val result = HashMap<String, Double>()
+        val query = "SELECT  * FROM $REVIEW_TABLE WHERE $PLACE_ID = '$place_id'"
+        val db = this.readableDatabase
+        val cursor: Cursor = db.rawQuery(query, null)
+        if (cursor.moveToFirst()) {
+            do {
+                val rating = cursor.getDouble(cursor.getColumnIndex("rating"))
+                ratings.add(rating)
+            } while (cursor.moveToNext())
+            for (i in ratings){
+                sumRatings += i
+            }
+            result["amount"] = ratings.size.toDouble()
+            result["ratings"] = sumRatings
+        }
+        return result
+    }
 
     fun addReview(review: Review) {
         val db = this.writableDatabase
         val values = ContentValues()
-        values.put("review_id", review.id)
         values.put("rating", review.rating)
         values.put("text", review.text)
         values.put("place_id", review.place_id)
@@ -80,17 +132,12 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
         values.put("name", result.name)
         values.put("latitude", result.geometry!!.location!!.lat)
         values.put("longitude", result.geometry!!.location!!.lng)
-        values.put("review_id", review.id)
+        values.put("text", review.text)
+        values.put("rating", review.rating)
+        values.put("date_time", review.time)
         // insert
         db.insert(VISITED_TABLE, null, values)
         Log.d("Saved place: ", result.name.toString())
         db.close()
-    }
-
-    companion object {
-        private const val DATABASE_VERSION = 1
-        private const val DATABASE_NAME = "FoodDB_2"
-        private const val REVIEW_TABLE = "reviews"
-        private const val VISITED_TABLE = "visited_places"
     }
 }

@@ -55,7 +55,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".VisitedActivity"
+            android:name=".VisitedPlacesActivity"
             android:parentActivityName=".HomeActivity">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />

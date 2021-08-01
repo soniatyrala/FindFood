@@ -14,7 +14,6 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.appbar.AppBarLayout
 import com.styrala.findfood.common.Common.currentResult
 import com.styrala.findfood.common.Common.db
 import com.styrala.findfood.common.Common.getPlaceDetailUrl
@@ -84,6 +83,7 @@ class ReviewActivity : AppCompatActivity() {
                     ) {
                         if (response.isSuccessful) {
                             reviews = response.body()!!.result!!.reviews!!
+                            currentResult.url = response.body()!!.result!!.url.toString()
                             for (i in reviews.indices) {
                                 addReview(reviews[i], linearLayout)
                             }
@@ -97,6 +97,7 @@ class ReviewActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     fun addReview(review: Review, linearLayout: View) {
         val reviewLayout = LinearLayout(this)
         reviewLayout.orientation = LinearLayout.VERTICAL
@@ -115,6 +116,7 @@ class ReviewActivity : AppCompatActivity() {
             ratingBar.layoutParams =
                 LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
             ratingBar.max = 5
+            ratingBar.stepSize = 0.5f
             ratingBar.rating = review.rating.toFloat()
             val stars = ratingBar.progressDrawable as LayerDrawable
             stars.getDrawable(2)
@@ -132,7 +134,7 @@ class ReviewActivity : AppCompatActivity() {
             val textView = TextView(this)
             textView.layoutParams =
                 LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            textView.text = review.text
+            textView.text = "\"" + review.text + "\""
             reviewLayout.addView(textView)
         }
 

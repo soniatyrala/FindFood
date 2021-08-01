@@ -26,7 +26,7 @@ class HomeActivity : AppCompatActivity() {
 
         val buttonVisited = findViewById<Button>(R.id.buttonHistory)
         buttonVisited.setOnClickListener {
-            val intent = Intent(this, VisitedActivity::class.java)
+            val intent = Intent(this, VisitedPlacesActivity::class.java)
             startActivity(intent)
         }
     }

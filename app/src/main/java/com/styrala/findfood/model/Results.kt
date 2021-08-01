@@ -16,4 +16,5 @@ class Results {
     var user_ratings_total = 0
     var vicinity: String? = null
     var reviews: List<Review>? = null
+    var url: String? = null
 }

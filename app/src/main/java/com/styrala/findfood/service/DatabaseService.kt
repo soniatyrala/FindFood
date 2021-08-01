@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.styrala.findfood.model.Results
 import com.styrala.findfood.model.Review
+import com.styrala.findfood.model.VisitedPlace
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -21,7 +22,7 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
 ) {
 
     companion object {
-        private const val DATABASE_VERSION = 7
+        private const val DATABASE_VERSION = 10
         private const val DATABASE_NAME = "FoodDB"
         private const val REVIEW_TABLE = "reviews"
         private const val PLACE_ID = "place_id"
@@ -38,7 +39,7 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
         val VISITED_TABLE = ("CREATE TABLE IF NOT EXISTS visited_places ( "
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, " + "place_id TEXT," + "name TEXT, "
                 + "latitude NUMERIC, " + "longitude NUMERIC," + "text TEXT," + "rating NUMERIC,"
-                + "date_time TEXT)")
+                + "url TEXT," + "date_time TEXT)")
         db.execSQL(VISITED_TABLE)
     }
 
@@ -53,23 +54,24 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
         onCreate(db)
     }
 
-    fun allReviews(): List<Review?> {
-        val reviews: LinkedList<Review> = LinkedList<Review>()
-        val query = "SELECT  * FROM $REVIEW_TABLE"
+    fun allVisitedPlaces(): LinkedList<VisitedPlace> {
+        val places: LinkedList<VisitedPlace> = LinkedList()
+        val query = "SELECT  * FROM $VISITED_TABLE group by $PLACE_ID order by $DATE_TIME desc"
         val db = this.writableDatabase
         val cursor: Cursor = db.rawQuery(query, null)
-        var review: Review?
+        var result: VisitedPlace?
         if (cursor.moveToFirst()) {
             do {
-                review = Review()
-                review.rating = cursor.getDouble(1)
-                review.text = cursor.getString(2)
-                review.place_id = cursor.getString(3)
-                review.time = cursor.getString(4)
-                reviews.add(review)
+                result = VisitedPlace()
+                result.place_id = cursor.getString(1)
+                result.name = cursor.getString(2)
+                result.text_review = cursor.getString(5)
+                result.rating_review = cursor.getDouble(6)
+                result.url = cursor.getString(7)
+                places.add(result)
             } while (cursor.moveToNext())
         }
-        return reviews
+        return places
     }
 
     @SuppressLint("Recycle")
@@ -134,6 +136,7 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
         values.put("longitude", result.geometry!!.location!!.lng)
         values.put("text", review.text)
         values.put("rating", review.rating)
+        values.put("url", result.url)
         values.put("date_time", review.time)
         // insert
         db.insert(VISITED_TABLE, null, values)

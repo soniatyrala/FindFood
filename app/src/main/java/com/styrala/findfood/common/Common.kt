@@ -17,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object Common {
     val MAPS_URL = "https://maps.googleapis.com/"
-    val API_KEY = "AIzaSyDbIZEc20wYfEwOKhCMzoU8J6iwVHZgMHQ"
+    val API_KEY = "paste API keys"
     val RESTAURANT_TYPE = "restaurant"
     lateinit var currentResult: Results
     lateinit var currentPlaces: Places

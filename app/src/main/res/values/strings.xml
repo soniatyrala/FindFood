@@ -6,4 +6,7 @@
     <string name="add_review">ADD REVIEW</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="map">FOOD MAP</string>
+    <string name="newest">NEWEST</string>
+    <string name="best">BEST</string>
+    <string name="worst">WORST</string>
 </resources>

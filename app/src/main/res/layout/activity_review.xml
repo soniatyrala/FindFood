@@ -17,11 +17,43 @@
         tools:showIn="@layout/activity_review">
 
         <LinearLayout
-            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:layout_marginTop="30dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/sorting_by_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/newest"
+                android:layout_marginRight="10dp"/>
+            <Button
+                android:id="@+id/sorting_by_best"
+                android:text="@string/best"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"/>
+            <Button
+                android:id="@+id/sorting_by_worst"
+                android:text="@string/worst"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical" />
+
+        </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
@@ -63,7 +95,8 @@
                     android:max="5"
                     android:progressBackgroundTint="#857A6B"
                     android:progressTint="#FF9800"
-                    android:rating="5" />
+                    android:rating="5"
+                    android:layout_marginTop="30dp"/>
 
                 <EditText
                     android:id="@+id/your_review"
@@ -82,8 +115,6 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -93,6 +124,18 @@
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@android:drawable/ic_input_add">
+        <requestFocus />
+    </com.google.android.material.floatingactionbutton.FloatingActionButton>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="@string/add_review"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|start"
+        android:src="@drawable/ic_baseline_photo_camera_24">
         <requestFocus />
     </com.google.android.material.floatingactionbutton.FloatingActionButton>
 

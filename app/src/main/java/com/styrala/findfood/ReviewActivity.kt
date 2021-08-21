@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.graphics.Typeface
 import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.os.Bundle
@@ -15,6 +16,7 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.styrala.findfood.common.Common.currentResult
+import com.styrala.findfood.common.Common.currentReviews
 import com.styrala.findfood.common.Common.db
 import com.styrala.findfood.common.Common.getPlaceDetailUrl
 import com.styrala.findfood.common.Common.googleApiService
@@ -25,12 +27,13 @@ import kotlinx.android.synthetic.main.activity_review.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 class ReviewActivity : AppCompatActivity() {
 
     private lateinit var mService: IGoogleAPIService
-    private lateinit var reviews: List<Review>
 
     @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(Build.VERSION_CODES.O)
@@ -52,7 +55,8 @@ class ReviewActivity : AppCompatActivity() {
             val review = Review(
                 ratingBar.rating.toDouble(),
                 editText.text.toString(),
-                System.currentTimeMillis().toString(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
                 currentResult.place_id.toString()
             )
             db.addReview(review)
@@ -63,37 +67,43 @@ class ReviewActivity : AppCompatActivity() {
             startActivity(Intent(this@ReviewActivity, ViewPlaceActivity::class.java))
         }
 
-        val linearLayout: View = findViewById(R.id.content)
+        val content: LinearLayout = findViewById(R.id.content)
 
         // Reviews from database
-        if (currentResult.place_id != null) {
-            reviews = db.getReviewsByPlaceId(currentResult.place_id!!)
-            for(i in reviews.indices) {
-                addReview(reviews[i], linearLayout)
+        currentReviews = db.getReviewsByPlaceId(currentResult.place_id!!)
+
+        // Reviews from Google API
+        createReviewsFromApi()
+
+        for(i in currentReviews.indices) {
+            addReview(currentReviews[i], content)
+        }
+
+        sorting_by_date.setOnClickListener {
+            content.removeAllViews()
+            var reviews = currentReviews as List<Review>
+            reviews = reviews.sortedByDescending { it.time }
+            for(r in reviews) {
+                addReview(r, content)
             }
         }
 
-        // Reviews from Google API
-        if (currentResult.place_id != null) {
-            mService.getPlaceDetails(getPlaceDetailUrl(currentResult.place_id!!))
-                .enqueue(object : Callback<PlaceDetails> {
-                    override fun onResponse(
-                        call: Call<PlaceDetails>,
-                        response: Response<PlaceDetails>
-                    ) {
-                        if (response.isSuccessful) {
-                            reviews = response.body()!!.result!!.reviews!!
-                            currentResult.url = response.body()!!.result!!.url.toString()
-                            for (i in reviews.indices) {
-                                addReview(reviews[i], linearLayout)
-                            }
-                        }
-                    }
+        sorting_by_best.setOnClickListener {
+            content.removeAllViews()
+            var reviews = currentReviews as List<Review>
+            reviews = reviews.sortedByDescending { it.rating }
+            for(r in reviews) {
+                addReview(r, content)
+            }
+        }
 
-                    override fun onFailure(call: Call<PlaceDetails>, t: Throwable) {
-                        Toast.makeText(baseContext, "" + t.message, Toast.LENGTH_SHORT).show()
-                    }
-                })
+        sorting_by_worst.setOnClickListener {
+            content.removeAllViews()
+            var reviews = currentReviews as List<Review>
+            reviews = reviews.sortedBy { it.rating }
+            for(r in reviews) {
+                addReview(r, content)
+            }
         }
     }
 
@@ -138,13 +148,53 @@ class ReviewActivity : AppCompatActivity() {
             reviewLayout.addView(textView)
         }
 
-        if (review.author_name != null) {
-            val authorView = TextView(this)
-            authorView.text = review.author_name
-            authorView.gravity = Gravity.RIGHT
-            authorView.layoutParams =
-                LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            reviewLayout.addView(authorView)
+        val desc = LinearLayout(this)
+        desc.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        desc.orientation = LinearLayout.HORIZONTAL
+        desc.gravity = Gravity.CENTER_VERTICAL
+        desc.setPadding(0, 20, 0, 20)
+
+        if (review.relative_time_description != null) {
+            val date = TextView(this)
+            date.text = review.relative_time_description
+            date.setTypeface(null, Typeface.ITALIC)
+            date.layoutParams =
+                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            date.setPadding(0, 0, 300, 0)
+            desc.addView(date)
+        }
+
+        val authorView = TextView(this)
+        authorView.text = review.author_name
+        authorView.setTypeface(null, Typeface.BOLD)
+        authorView.layoutParams =
+            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        desc.addView(authorView)
+        reviewLayout.addView(desc)
+    }
+
+    private fun createReviewsFromApi() {
+        if (currentResult.place_id != null) {
+            mService.getPlaceDetails(getPlaceDetailUrl(currentResult.place_id!!))
+                .enqueue(object : Callback<PlaceDetails> {
+                    override fun onResponse(
+                        call: Call<PlaceDetails>,
+                        response: Response<PlaceDetails>
+                    ) {
+                        if (response.isSuccessful) {
+                            val reviews = response.body()!!.result!!.reviews
+                            currentResult.url = response.body()!!.result!!.url.toString()
+                            for (i in reviews!!.indices) {
+                                currentReviews.add(reviews[i])
+                                addReview(reviews[i], content)
+                            }
+                        }
+                    }
+
+                    override fun onFailure(call: Call<PlaceDetails>, t: Throwable) {
+                        Toast.makeText(baseContext, "" + t.message, Toast.LENGTH_SHORT).show()
+                    }
+                })
         }
     }
 }

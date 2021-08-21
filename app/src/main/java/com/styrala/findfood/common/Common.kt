@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.styrala.findfood.R
 import com.styrala.findfood.model.Places
 import com.styrala.findfood.model.Results
+import com.styrala.findfood.model.Review
 import com.styrala.findfood.service.BitmapDescriptorService
 import com.styrala.findfood.service.DatabaseService
 import com.styrala.findfood.service.IGoogleAPIService
@@ -23,6 +24,7 @@ object Common {
     lateinit var currentPlaces: Places
     lateinit var db: DatabaseService
     var currentMarkers: MutableList<Marker> = mutableListOf()
+    var currentReviews: MutableList<Review> = mutableListOf()
     var defaultLocation: LatLng = LatLng(52.222727, 21.014003)
 
     val googleApiService: IGoogleAPIService

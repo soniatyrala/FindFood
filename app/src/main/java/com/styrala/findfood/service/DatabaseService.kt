@@ -22,11 +22,12 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
 ) {
 
     companion object {
-        private const val DATABASE_VERSION = 10
+        private const val DATABASE_VERSION = 12
         private const val DATABASE_NAME = "FoodDB"
         private const val REVIEW_TABLE = "reviews"
         private const val PLACE_ID = "place_id"
         private const val DATE_TIME = "date_time"
+        private const val ID = "id"
         private const val VISITED_TABLE = "visited_places"
     }
 
@@ -77,7 +78,7 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
     @SuppressLint("Recycle")
     fun getReviewsByPlaceId(place_id: String): LinkedList<Review> {
         val reviews: LinkedList<Review> = LinkedList()
-        val query = "SELECT  * FROM $REVIEW_TABLE WHERE $PLACE_ID = '$place_id' order by $DATE_TIME desc"
+        val query = "SELECT  * FROM $REVIEW_TABLE WHERE $PLACE_ID = '$place_id' order by $ID desc"
         val db = this.readableDatabase
         val cursor: Cursor = db.rawQuery(query, null)
         if (cursor.moveToFirst()) {
@@ -86,7 +87,7 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
                 val text = cursor.getString(cursor.getColumnIndex("text"))
                 val placeId = cursor.getString(cursor.getColumnIndex("place_id"))
                 val time = cursor.getString(cursor.getColumnIndex("date_time"))
-                val review = Review(rating, text, time, placeId)
+                val review = Review(rating, text, time, time, placeId)
                 reviews.add(review)
             } while (cursor.moveToNext())
         }

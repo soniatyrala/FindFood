@@ -22,24 +22,25 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
 ) {
 
     companion object {
-        private const val DATABASE_VERSION = 10
+        private const val DATABASE_VERSION = 13
         private const val DATABASE_NAME = "FoodDB"
         private const val REVIEW_TABLE = "reviews"
         private const val PLACE_ID = "place_id"
         private const val DATE_TIME = "date_time"
+        private const val ID = "id"
         private const val VISITED_TABLE = "visited_places"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         val REVIEW_TABLE = ("CREATE TABLE IF NOT EXISTS reviews ( "
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT," + "rating NUMERIC, "
-                + "text TEXT, " + "place_id TEXT," + "date_time TEXT)")
+                + "text TEXT, " + "place_id TEXT," + "date_time TEXT," + "photo_uri TEXT)")
         db.execSQL(REVIEW_TABLE)
 
         val VISITED_TABLE = ("CREATE TABLE IF NOT EXISTS visited_places ( "
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, " + "place_id TEXT," + "name TEXT, "
                 + "latitude NUMERIC, " + "longitude NUMERIC," + "text TEXT," + "rating NUMERIC,"
-                + "url TEXT," + "date_time TEXT)")
+                + "url TEXT," + "date_time TEXT," + "photo_uri TEXT)")
         db.execSQL(VISITED_TABLE)
     }
 
@@ -56,7 +57,7 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
 
     fun allVisitedPlaces(): LinkedList<VisitedPlace> {
         val places: LinkedList<VisitedPlace> = LinkedList()
-        val query = "SELECT  * FROM $VISITED_TABLE group by $PLACE_ID order by $DATE_TIME desc"
+        val query = "SELECT  * FROM $VISITED_TABLE group by $PLACE_ID order by $ID desc"
         val db = this.writableDatabase
         val cursor: Cursor = db.rawQuery(query, null)
         var result: VisitedPlace?
@@ -68,6 +69,12 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
                 result.text_review = cursor.getString(5)
                 result.rating_review = cursor.getDouble(6)
                 result.url = cursor.getString(7)
+                result.time = cursor.getString(8)
+                if (cursor.getString(9) != null) {
+                    result.photo_uri = cursor.getString(9)
+                } else {
+                    result.photo_uri = " "
+                }
                 places.add(result)
             } while (cursor.moveToNext())
         }
@@ -77,16 +84,22 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
     @SuppressLint("Recycle")
     fun getReviewsByPlaceId(place_id: String): LinkedList<Review> {
         val reviews: LinkedList<Review> = LinkedList()
-        val query = "SELECT  * FROM $REVIEW_TABLE WHERE $PLACE_ID = '$place_id' order by $DATE_TIME desc"
+        val query = "SELECT  * FROM $REVIEW_TABLE WHERE $PLACE_ID = '$place_id' order by $ID desc"
         val db = this.readableDatabase
         val cursor: Cursor = db.rawQuery(query, null)
         if (cursor.moveToFirst()) {
             do {
+                var review: Review
                 val rating = cursor.getDouble(cursor.getColumnIndex("rating"))
                 val text = cursor.getString(cursor.getColumnIndex("text"))
                 val placeId = cursor.getString(cursor.getColumnIndex("place_id"))
                 val time = cursor.getString(cursor.getColumnIndex("date_time"))
-                val review = Review(rating, text, time, placeId)
+                val photoUri = cursor.getString(cursor.getColumnIndex("photo_uri"))
+                if (photoUri != null) {
+                    review = Review(rating, text, time, time, placeId, photoUri)
+                } else {
+                    review = Review(rating, text, time, time, placeId)
+                }
                 reviews.add(review)
             } while (cursor.moveToNext())
         }
@@ -121,6 +134,11 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
         values.put("text", review.text)
         values.put("place_id", review.place_id)
         values.put("date_time", review.time)
+        if ( review.profile_photo_url != null) {
+            values.put("photo_uri", review.profile_photo_url)
+        } else {
+            values.put("photo_uri", " ")
+        }
         // insert
         db.insert(REVIEW_TABLE, null, values)
         Log.d("Saved review: ", review.time.toString())
@@ -138,6 +156,11 @@ class DatabaseService(context: Context?) : SQLiteOpenHelper(
         values.put("rating", review.rating)
         values.put("url", result.url)
         values.put("date_time", review.time)
+        if ( review.profile_photo_url != null) {
+            values.put("photo_uri", review.profile_photo_url)
+        } else {
+            values.put("photo_uri", " ")
+        }
         // insert
         db.insert(VISITED_TABLE, null, values)
         Log.d("Saved place: ", result.name.toString())

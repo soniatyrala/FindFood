@@ -6,4 +6,6 @@ class VisitedPlace {
     var text_review: String? = null
     var rating_review: Double? = null
     var url: String? = null
+    var time: String? = null
+    var photo_uri: String? = null
 }

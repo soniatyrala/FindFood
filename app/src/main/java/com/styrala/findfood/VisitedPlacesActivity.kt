@@ -2,6 +2,7 @@ package com.styrala.findfood
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.LayerDrawable
@@ -10,6 +11,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RatingBar
 import android.widget.TextView
@@ -61,18 +63,6 @@ class VisitedPlacesActivity : AppCompatActivity() {
             placesLayout.addView(placeName)
         }
 
-        if (place.text_review != null) {
-            val textView = TextView(this)
-            textView.layoutParams =
-                ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            textView.setPadding(20, 20, 0, 20)
-            textView.text = "\"" + place.text_review + "\""
-            placesLayout.addView(textView)
-        }
-
         val rating = LinearLayout(this)
         rating.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -108,5 +98,37 @@ class VisitedPlacesActivity : AppCompatActivity() {
             placesLayout.addView(rating)
         }
 
+        if (place.photo_uri != null && place.photo_uri!!.contains(".jpg")) {
+            val image = ImageView(this)
+            image.setImageBitmap(BitmapFactory.decodeFile(place.photo_uri))
+            val layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 400)
+            image.layoutParams = layoutParams
+            placesLayout.addView(image)
+        }
+
+        if (place.text_review != null) {
+            val textView = TextView(this)
+            textView.layoutParams =
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            textView.setPadding(20, 20, 0, 20)
+            textView.text = "\"" + place.text_review + "\""
+            placesLayout.addView(textView)
+        }
+
+        if (place.time != null) {
+            val textView = TextView(this)
+            textView.layoutParams =
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            textView.setPadding(20, 20, 0, 20)
+            textView.text = "\"" + place.time + "\""
+            textView.gravity = Gravity.LEFT
+            placesLayout.addView(textView)
+        }
     }
 }

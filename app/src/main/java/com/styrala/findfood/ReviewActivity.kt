@@ -1,13 +1,19 @@
 package com.styrala.findfood
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.graphics.drawable.LayerDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.View.OnTouchListener
@@ -15,6 +21,8 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import com.styrala.findfood.common.Common.APP_TAG
 import com.styrala.findfood.common.Common.currentResult
 import com.styrala.findfood.common.Common.currentReviews
 import com.styrala.findfood.common.Common.db
@@ -27,6 +35,7 @@ import kotlinx.android.synthetic.main.activity_review.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -34,8 +43,9 @@ import java.time.format.DateTimeFormatter
 class ReviewActivity : AppCompatActivity() {
 
     private lateinit var mService: IGoogleAPIService
+    private var photoFile: File = File("null")
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "QueryPermissionsNeeded")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,13 +62,26 @@ class ReviewActivity : AppCompatActivity() {
         })
 
         fab.setOnClickListener { view ->
-            val review = Review(
-                ratingBar.rating.toDouble(),
-                editText.text.toString(),
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
-                currentResult.place_id.toString()
-            )
+            lateinit var review: Review
+            if (!photoFile.absolutePath.contains("null")) {
+                review = Review(
+                    ratingBar.rating.toDouble(),
+                    editText.text.toString(),
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
+                    currentResult.place_id.toString(),
+                    photoFile.absolutePath
+                )
+            } else {
+                review = Review(
+                    ratingBar.rating.toDouble(),
+                    editText.text.toString(),
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
+                    currentResult.place_id.toString()
+                )
+            }
+
             db.addReview(review)
             db.addVisitedPlace(currentResult, review)
 
@@ -75,7 +98,7 @@ class ReviewActivity : AppCompatActivity() {
         // Reviews from Google API
         createReviewsFromApi()
 
-        for(i in currentReviews.indices) {
+        for (i in currentReviews.indices) {
             addReview(currentReviews[i], content)
         }
 
@@ -83,7 +106,7 @@ class ReviewActivity : AppCompatActivity() {
             content.removeAllViews()
             var reviews = currentReviews as List<Review>
             reviews = reviews.sortedByDescending { it.time }
-            for(r in reviews) {
+            for (r in reviews) {
                 addReview(r, content)
             }
         }
@@ -92,7 +115,7 @@ class ReviewActivity : AppCompatActivity() {
             content.removeAllViews()
             var reviews = currentReviews as List<Review>
             reviews = reviews.sortedByDescending { it.rating }
-            for(r in reviews) {
+            for (r in reviews) {
                 addReview(r, content)
             }
         }
@@ -101,8 +124,26 @@ class ReviewActivity : AppCompatActivity() {
             content.removeAllViews()
             var reviews = currentReviews as List<Review>
             reviews = reviews.sortedBy { it.rating }
-            for(r in reviews) {
+            for (r in reviews) {
                 addReview(r, content)
+            }
+        }
+
+        fab_photo.setOnClickListener {
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            photoFile = getPhotoFileUri(
+                LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("ddMMyy_HHmm")) + "_" + currentResult.place_id.toString() + ".jpg"
+            )
+            val fileProvider: Uri =
+                FileProvider.getUriForFile(
+                    this@ReviewActivity,
+                    "com.codepath.fileprovider.findfood",
+                    photoFile!!
+                )
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivityForResult(intent, 1034);
             }
         }
     }
@@ -145,7 +186,16 @@ class ReviewActivity : AppCompatActivity() {
             textView.layoutParams =
                 LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             textView.text = "\"" + review.text + "\""
+            textView.setPadding(0, 0, 0, 20)
             reviewLayout.addView(textView)
+        }
+
+        if (review.profile_photo_url != null && review.profile_photo_url!!.contains(".jpg")) {
+            val image = ImageView(this)
+            image.setImageBitmap(BitmapFactory.decodeFile(review.profile_photo_url))
+            val layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 400)
+            image.layoutParams = layoutParams
+            reviewLayout.addView(image)
         }
 
         val desc = LinearLayout(this)
@@ -195,6 +245,27 @@ class ReviewActivity : AppCompatActivity() {
                         Toast.makeText(baseContext, "" + t.message, Toast.LENGTH_SHORT).show()
                     }
                 })
+        }
+    }
+
+    fun getPhotoFileUri(fileName: String): File {
+        val mediaStorageDir =
+            File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), APP_TAG)
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
+            Log.d(APP_TAG, "failed to create directory")
+        }
+        return File(mediaStorageDir.path + File.separator + fileName)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1034) {
+            if (resultCode == Activity.RESULT_OK) {
+                Toast.makeText(this, "Picture was taken! Please, add review!", Toast.LENGTH_SHORT)
+                    .show()
+            } else { // Result was a failure
+                Toast.makeText(this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ object Common {
     val MAPS_URL = "https://maps.googleapis.com/"
     val API_KEY = "paste API keys"
     val RESTAURANT_TYPE = "restaurant"
+    val APP_TAG = "FindFood"
     lateinit var currentResult: Results
     lateinit var currentPlaces: Places
     lateinit var db: DatabaseService

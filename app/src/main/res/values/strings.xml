@@ -9,4 +9,5 @@
     <string name="newest">NEWEST</string>
     <string name="best">BEST</string>
     <string name="worst">WORST</string>
+    <string name="takenphoto">takenPhoto</string>
 </resources>
